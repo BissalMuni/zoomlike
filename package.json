@@ -1,13 +1,21 @@
 {
   "name": "zoomlike",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Personal screen sharing tool — WebRTC P2P, zero server cost",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
-  "keywords": [],
+  "keywords": ["webrtc", "screen-sharing", "p2p", "peerjs"],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.30.3"
+  "packageManager": "pnpm@10.30.3",
+  "dependencies": {
+    "peerjs": "^1.5.4"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0",
+    "jsdom": "^26.0.0"
+  }
 }

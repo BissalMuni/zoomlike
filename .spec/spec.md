@@ -18,12 +18,12 @@
 ## Requirements
 
 ### MVP (v1.0)
-- [ ] Screen capture using `getDisplayMedia` API
-- [ ] P2P connection via PeerJS
-- [ ] Share session via peer ID (copy/paste)
-- [ ] Real-time screen viewing
-- [ ] Stop sharing button
-- [ ] Connection status indicator
+- [x] Screen capture using `getDisplayMedia` API
+- [x] P2P connection via PeerJS
+- [x] Share session via peer ID (copy/paste)
+- [x] Real-time screen viewing
+- [x] Stop sharing button
+- [x] Connection status indicator
 
 ### Future (v2.0+)
 - [ ] Shareable URL with embedded peer ID

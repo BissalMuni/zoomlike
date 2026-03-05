@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zoomlike — Screen Sharing</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Zoomlike</h1>
+    <p class="subtitle">P2P Screen Sharing</p>
+
+    <!-- 역할 선택 -->
+    <div id="role-select">
+      <button id="btn-sharer" class="role-btn">화면 공유하기</button>
+      <button id="btn-viewer" class="role-btn">화면 보기</button>
+    </div>
+
+    <!-- 공유자 화면 -->
+    <div id="sharer-panel" class="panel hidden">
+      <div class="status" id="sharer-status">준비 중...</div>
+      <div id="peer-id-display" class="peer-id-box hidden">
+        <label>공유 코드:</label>
+        <span id="peer-id-text"></span>
+        <button id="btn-copy" class="small-btn">복사</button>
+      </div>
+      <div class="controls">
+        <button id="btn-start-share" class="primary-btn">공유 시작</button>
+        <button id="btn-stop-share" class="danger-btn hidden">공유 중지</button>
+      </div>
+      <video id="local-video" autoplay muted playsinline></video>
+      <button id="btn-back-sharer" class="back-btn">← 돌아가기</button>
+    </div>
+
+    <!-- 뷰어 화면 -->
+    <div id="viewer-panel" class="panel hidden">
+      <div class="status" id="viewer-status">연결 대기 중...</div>
+      <div class="join-form">
+        <input type="text" id="input-peer-id" placeholder="공유 코드 입력" />
+        <button id="btn-connect" class="primary-btn">연결</button>
+      </div>
+      <video id="remote-video" autoplay playsinline></video>
+      <button id="btn-back-viewer" class="back-btn">← 돌아가기</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
