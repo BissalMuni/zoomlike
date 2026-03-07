@@ -26,7 +26,7 @@
 - [x] Connection status indicator
 
 ### Future (v2.0+)
-- [ ] Shareable URL with embedded peer ID
+- [x] Shareable URL with embedded peer ID
 - [ ] Audio sharing option
 - [ ] Multiple viewers (small group)
 - [ ] Chat alongside screen share

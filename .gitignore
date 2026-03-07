@@ -6,3 +6,4 @@ dist/
 *.log
 Dockerfile.claude
 docker-compose.claude.yml
+.claude-output/

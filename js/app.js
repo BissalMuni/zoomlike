@@ -2,6 +2,7 @@
 
 import { Sharer } from './sharer.js';
 import { Viewer } from './viewer.js';
+import { buildShareUrl, getPeerIdFromUrl } from './url.js';
 
 (function () {
   'use strict';
@@ -17,10 +18,13 @@ import { Viewer } from './viewer.js';
   const btnStartShare = $('btn-start-share');
   const btnStopShare = $('btn-stop-share');
   const btnCopy = $('btn-copy');
+  const btnCopyUrl = $('btn-copy-url');
   const btnBackSharer = $('btn-back-sharer');
   const sharerStatus = $('sharer-status');
   const peerIdDisplay = $('peer-id-display');
   const peerIdText = $('peer-id-text');
+  const shareUrlDisplay = $('share-url-display');
+  const shareUrlText = $('share-url-text');
   const localVideo = $('local-video');
 
   // 뷰어 UI 요소
@@ -70,6 +74,7 @@ import { Viewer } from './viewer.js';
     btnStartShare.classList.remove('hidden');
     btnStopShare.classList.add('hidden');
     peerIdDisplay.classList.add('hidden');
+    shareUrlDisplay.classList.add('hidden');
     roleSelect.classList.remove('hidden');
     sharerPanel.classList.add('hidden');
     viewerPanel.classList.add('hidden');
@@ -87,6 +92,9 @@ import { Viewer } from './viewer.js';
     sharer.onPeerIdReady = (id) => {
       peerIdText.textContent = id;
       peerIdDisplay.classList.remove('hidden');
+      // 공유 URL 생성 및 표시
+      shareUrlText.value = buildShareUrl(id);
+      shareUrlDisplay.classList.remove('hidden');
     };
 
     sharer.onStreamReady = (stream) => {
@@ -146,10 +154,10 @@ import { Viewer } from './viewer.js';
       updateStatus(viewerStatus, 'error', '피어 초기화 실패');
     }
 
-    // URL 해시에 peer ID가 있으면 자동 연결
-    const hashId = window.location.hash.slice(1);
-    if (hashId) {
-      inputPeerId.value = hashId;
+    // URL 쿼리 파라미터에 peer ID가 있으면 자동 연결
+    const urlPeerId = getPeerIdFromUrl();
+    if (urlPeerId) {
+      inputPeerId.value = urlPeerId;
       connectToSharer();
     }
   }
@@ -178,10 +186,24 @@ import { Viewer } from './viewer.js';
     });
   });
 
+  // 공유 URL 복사 버튼
+  btnCopyUrl.addEventListener('click', () => {
+    const url = shareUrlText.value;
+    navigator.clipboard.writeText(url).then(() => {
+      btnCopyUrl.textContent = '복사됨!';
+      setTimeout(() => { btnCopyUrl.textContent = 'URL 복사'; }, 1500);
+    });
+  });
+
   btnConnect.addEventListener('click', connectToSharer);
 
   // Enter 키로 연결
   inputPeerId.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') connectToSharer();
   });
+
+  // 페이지 로드 시 URL에 peer 파라미터가 있으면 자동으로 뷰어 모드 진입
+  if (getPeerIdFromUrl()) {
+    initViewer();
+  }
 })();

@@ -110,6 +110,35 @@ h1 {
   user-select: all;
 }
 
+/* 공유 URL 표시 */
+.share-url-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #1a1a2e;
+  border-radius: 6px;
+}
+
+.share-url-box label {
+  color: #888;
+  white-space: nowrap;
+}
+
+.share-url-box input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background: #0f0f1a;
+  color: #7c6ff7;
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
 /* 버튼 공통 */
 button {
   border: none;
@@ -217,5 +246,10 @@ video {
 
   .join-form input {
     width: 100%;
+  }
+
+  .share-url-box {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
