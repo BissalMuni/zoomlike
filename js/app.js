@@ -199,14 +199,19 @@ import { buildShareUrl, getPeerIdFromUrl } from './url.js';
     });
   });
 
-  // 전체화면 토글
+  // 전체화면 토글 — video 요소 직접 사용 (div보다 호환성 높음)
   btnFullscreen.addEventListener('click', () => {
     if (!document.fullscreenElement) {
-      videoWrapper.requestFullscreen().catch(() => {});
-      btnFullscreen.textContent = '✕';
-      btnFullscreen.title = '전체화면 해제';
+      const req = remoteVideo.requestFullscreen
+        || remoteVideo.webkitRequestFullscreen
+        || remoteVideo.mozRequestFullScreen
+        || remoteVideo.msRequestFullscreen;
+      if (req) req.call(remoteVideo);
     } else {
-      document.exitFullscreen();
+      (document.exitFullscreen
+        || document.webkitExitFullscreen
+        || document.mozCancelFullScreen
+        || document.msExitFullscreen).call(document);
     }
   });
 
@@ -215,6 +220,9 @@ import { buildShareUrl, getPeerIdFromUrl } from './url.js';
     if (!document.fullscreenElement) {
       btnFullscreen.textContent = '⛶';
       btnFullscreen.title = '전체화면';
+    } else {
+      btnFullscreen.textContent = '✕';
+      btnFullscreen.title = '전체화면 해제';
     }
   });
 
