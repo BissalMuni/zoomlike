@@ -139,6 +139,8 @@ import { buildShareUrl, getPeerIdFromUrl } from './url.js';
 
     viewer.onStreamReceived = (stream) => {
       remoteVideo.srcObject = stream;
+      // 일부 브라우저에서 명시적 play() 필요
+      remoteVideo.play().catch(() => {});
     };
 
     viewer.onError = (err) => {
