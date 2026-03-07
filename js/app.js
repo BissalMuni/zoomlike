@@ -34,6 +34,8 @@ import { buildShareUrl, getPeerIdFromUrl } from './url.js';
   const viewerStatus = $('viewer-status');
   const inputPeerId = $('input-peer-id');
   const remoteVideo = $('remote-video');
+  const btnFullscreen = $('btn-fullscreen');
+  const videoWrapper = remoteVideo.closest('.video-wrapper');
 
   let sharer = null;
   let viewer = null;
@@ -195,6 +197,25 @@ import { buildShareUrl, getPeerIdFromUrl } from './url.js';
       btnCopyUrl.textContent = '복사됨!';
       setTimeout(() => { btnCopyUrl.textContent = 'URL 복사'; }, 1500);
     });
+  });
+
+  // 전체화면 토글
+  btnFullscreen.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      videoWrapper.requestFullscreen().catch(() => {});
+      btnFullscreen.textContent = '✕';
+      btnFullscreen.title = '전체화면 해제';
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  // 전체화면 해제 시 버튼 아이콘 복원
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement) {
+      btnFullscreen.textContent = '⛶';
+      btnFullscreen.title = '전체화면';
+    }
   });
 
   btnConnect.addEventListener('click', connectToSharer);
