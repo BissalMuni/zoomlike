@@ -68,7 +68,13 @@ class Sharer {
     try {
       this.stream = await navigator.mediaDevices.getDisplayMedia({
         video: { cursor: 'always' },
-        audio: false
+        // 시스템 오디오(스테레오) 캡처 — 마이크 아님
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 2
+        }
       });
 
       // 사용자가 브라우저 UI로 공유를 중지했을 때
