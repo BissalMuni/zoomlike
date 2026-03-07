@@ -106,18 +106,23 @@ class Viewer {
    * @returns {MediaStream}
    */
   _createEmptyStream() {
-    // 브라우저 환경: canvas에서 빈 스트림 생성
+    // SDP 협상에 오디오/비디오 모두 포함시키기 위해 빈 트랙 생성
     try {
       const canvas = document.createElement('canvas');
       canvas.width = 1;
       canvas.height = 1;
       const ctx = canvas.getContext('2d');
       if (ctx) ctx.fillRect(0, 0, 1, 1);
-      if (typeof canvas.captureStream === 'function') {
-        return canvas.captureStream(0);
-      }
+      const stream = canvas.captureStream(0);
+
+      // 빈 오디오 트랙 추가 — 없으면 공유자의 오디오가 SDP에 포함되지 않음
+      const audioCtx = new AudioContext();
+      const dest = audioCtx.createMediaStreamDestination();
+      const audioTrack = dest.stream.getAudioTracks()[0];
+      if (audioTrack) stream.addTrack(audioTrack);
+
+      return stream;
     } catch { /* 테스트 환경에서는 무시 */ }
-    // 폴백: 빈 객체 (PeerJS call에 전달용)
     return { getTracks: () => [] };
   }
 }
