@@ -3,12 +3,17 @@
 import { Sharer } from './sharer.js';
 import { Viewer } from './viewer.js';
 import { buildShareUrl, getPeerIdFromUrl } from './url.js';
+import { PASSWORD_HASH } from './config.js';
 
 (function () {
   'use strict';
 
   // DOM 요소
   const $ = (id) => document.getElementById(id);
+  const loginScreen = $('login-screen');
+  const inputPassword = $('input-password');
+  const btnLogin = $('btn-login');
+  const loginError = $('login-error');
   const roleSelect = $('role-select');
   const sharerPanel = $('sharer-panel');
   const viewerPanel = $('viewer-panel');
@@ -39,6 +44,41 @@ import { buildShareUrl, getPeerIdFromUrl } from './url.js';
 
   let sharer = null;
   let viewer = null;
+
+  // --- 인증 ---
+
+  /** SHA-256 해시 생성 */
+  async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const hash = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  /** 비밀번호 검증 후 역할 선택 화면으로 전환 */
+  async function handleLogin() {
+    const password = inputPassword.value;
+    if (!password) return;
+
+    const hash = await sha256(password);
+    if (hash === PASSWORD_HASH) {
+      loginScreen.classList.add('hidden');
+      roleSelect.classList.remove('hidden');
+
+      // URL에 peer 파라미터가 있으면 자동으로 뷰어 모드 진입
+      if (getPeerIdFromUrl()) {
+        initViewer();
+      }
+    } else {
+      loginError.classList.remove('hidden');
+      inputPassword.value = '';
+      inputPassword.focus();
+    }
+  }
+
+  btnLogin.addEventListener('click', handleLogin);
+  inputPassword.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleLogin();
+  });
 
   // --- 유틸리티 ---
 
@@ -233,8 +273,6 @@ import { buildShareUrl, getPeerIdFromUrl } from './url.js';
     if (e.key === 'Enter') connectToSharer();
   });
 
-  // 페이지 로드 시 URL에 peer 파라미터가 있으면 자동으로 뷰어 모드 진입
-  if (getPeerIdFromUrl()) {
-    initViewer();
-  }
+  // 페이지 로드 시 비밀번호 입력에 포커스
+  inputPassword.focus();
 })();

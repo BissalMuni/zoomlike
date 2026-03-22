@@ -107,23 +107,28 @@ class Viewer {
    */
   _createEmptyStream() {
     // SDP 협상에 오디오/비디오 모두 포함시키기 위해 빈 트랙 생성
+    let stream;
     try {
       const canvas = document.createElement('canvas');
       canvas.width = 1;
       canvas.height = 1;
       const ctx = canvas.getContext('2d');
       if (ctx) ctx.fillRect(0, 0, 1, 1);
-      const stream = canvas.captureStream(0);
+      stream = canvas.captureStream(0);
+    } catch { /* 테스트 환경에서는 무시 */ }
 
-      // 빈 오디오 트랙 추가 — 없으면 공유자의 오디오가 SDP에 포함되지 않음
+    if (!stream) return { getTracks: () => [] };
+
+    // 빈 오디오 트랙 추가 — 없으면 공유자의 오디오가 SDP에 포함되지 않음
+    // AudioContext는 유저 제스처 없이 실패할 수 있으므로 별도 try/catch
+    try {
       const audioCtx = new AudioContext();
       const dest = audioCtx.createMediaStreamDestination();
       const audioTrack = dest.stream.getAudioTracks()[0];
       if (audioTrack) stream.addTrack(audioTrack);
+    } catch { /* 유저 제스처 없이 AudioContext 생성 실패 시 비디오만 전송 */ }
 
-      return stream;
-    } catch { /* 테스트 환경에서는 무시 */ }
-    return { getTracks: () => [] };
+    return stream;
   }
 }
 

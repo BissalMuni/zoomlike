@@ -11,8 +11,17 @@
     <h1>Zoomlike</h1>
     <p class="subtitle">P2P Screen Sharing</p>
 
+    <!-- 비밀번호 입력 -->
+    <div id="login-screen">
+      <div class="login-form">
+        <input type="password" id="input-password" placeholder="비밀번호 입력" />
+        <button id="btn-login" class="primary-btn">입장</button>
+      </div>
+      <div id="login-error" class="login-error hidden">비밀번호가 틀렸습니다</div>
+    </div>
+
     <!-- 역할 선택 -->
-    <div id="role-select">
+    <div id="role-select" class="hidden">
       <button id="btn-sharer" class="role-btn">화면 공유하기</button>
       <button id="btn-viewer" class="role-btn">화면 보기</button>
     </div>
