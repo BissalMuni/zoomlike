@@ -10,8 +10,8 @@ class Sharer {
   constructor() {
     this.peer = null;
     this.stream = null;
-    this.currentCall = null;
-    this.dataConn = null;
+    this.calls = [];
+    this.dataConns = [];
     this.onStatusChange = null;
     this.onPeerIdReady = null;
     this.onStreamReady = null;
@@ -40,28 +40,36 @@ class Sharer {
       if (this.onStatusChange) this.onStatusChange('ready', '공유 준비 완료');
     });
 
-    // 뷰어가 연결 요청 시
+    // 뷰어가 연결 요청 시 (최대 5명)
     this.peer.on('call', (call) => {
       if (!this.stream) return;
+      if (this.calls.length >= 5) {
+        call.close();
+        return;
+      }
       call.answer(this.stream);
-      this.currentCall = call;
+      this.calls.push(call);
       if (this.onViewerConnected) this.onViewerConnected();
-      if (this.onStatusChange) this.onStatusChange('connected', '뷰어 연결됨');
+      if (this.onStatusChange) this.onStatusChange('connected', `뷰어 ${this.calls.length}명 연결됨`);
 
       call.on('close', () => {
-        this.currentCall = null;
-        if (this.onStatusChange) this.onStatusChange('ready', '뷰어 연결 해제됨');
+        this.calls = this.calls.filter((c) => c !== call);
+        const count = this.calls.length;
+        if (this.onStatusChange) this.onStatusChange(
+          count > 0 ? 'connected' : 'ready',
+          count > 0 ? `뷰어 ${count}명 연결됨` : '뷰어 연결 해제됨'
+        );
       });
     });
 
     // 뷰어가 데이터 채널 연결 시 (채팅용)
     this.peer.on('connection', (conn) => {
-      this.dataConn = conn;
+      this.dataConns.push(conn);
       conn.on('data', (data) => {
         if (this.onChatMessage) this.onChatMessage(data);
       });
       conn.on('close', () => {
-        this.dataConn = null;
+        this.dataConns = this.dataConns.filter((c) => c !== conn);
       });
     });
 
@@ -117,10 +125,8 @@ class Sharer {
       this.stream = null;
     }
 
-    if (this.currentCall) {
-      this.currentCall.close();
-      this.currentCall = null;
-    }
+    this.calls.forEach((call) => call.close());
+    this.calls = [];
 
     if (this.onStatusChange) this.onStatusChange('ready', '공유 중지됨');
   }
@@ -130,9 +136,9 @@ class Sharer {
    * @param {string} message
    */
   sendChat(message) {
-    if (this.dataConn && this.dataConn.open) {
-      this.dataConn.send(message);
-    }
+    this.dataConns.forEach((conn) => {
+      if (conn.open) conn.send(message);
+    });
   }
 
   /**
@@ -140,10 +146,8 @@ class Sharer {
    */
   destroy() {
     this.stopCapture();
-    if (this.dataConn) {
-      this.dataConn.close();
-      this.dataConn = null;
-    }
+    this.dataConns.forEach((conn) => conn.close());
+    this.dataConns = [];
     if (this.peer) {
       this.peer.destroy();
       this.peer = null;
