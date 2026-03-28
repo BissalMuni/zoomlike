@@ -63,27 +63,6 @@
       <button id="btn-back-viewer" class="back-btn">← 돌아가기</button>
     </div>
   </div>
-
-  <!-- 드래그 가능 채팅 팝업 -->
-  <div id="chat-popup" class="chat-popup hidden">
-    <div class="chat-popup-header" id="chat-popup-header">
-      <span>💬 채팅</span>
-      <div class="chat-toolbar">
-        <label>투명도</label>
-        <input type="range" id="chat-opacity" min="20" max="100" value="100" />
-      </div>
-      <div class="chat-header-controls">
-        <button id="btn-chat-topmost" class="chat-header-btn" title="항상 위">📌</button>
-        <button id="btn-chat-close" class="chat-close-btn">✕</button>
-      </div>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-input">
-      <input type="text" id="chat-input" placeholder="메시지 입력..." />
-      <button id="btn-chat-send" class="small-btn">전송</button>
-    </div>
-  </div>
-
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <script type="module" src="js/app.js"></script>
 </body>
