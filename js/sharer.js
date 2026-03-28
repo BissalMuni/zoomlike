@@ -11,10 +11,13 @@ class Sharer {
     this.peer = null;
     this.stream = null;
     this.currentCall = null;
+    this.dataConn = null;
     this.onStatusChange = null;
     this.onPeerIdReady = null;
     this.onStreamReady = null;
     this.onError = null;
+    this.onChatMessage = null;
+    this.onViewerConnected = null;
   }
 
   /**
@@ -42,11 +45,23 @@ class Sharer {
       if (!this.stream) return;
       call.answer(this.stream);
       this.currentCall = call;
+      if (this.onViewerConnected) this.onViewerConnected();
       if (this.onStatusChange) this.onStatusChange('connected', '뷰어 연결됨');
 
       call.on('close', () => {
         this.currentCall = null;
         if (this.onStatusChange) this.onStatusChange('ready', '뷰어 연결 해제됨');
+      });
+    });
+
+    // 뷰어가 데이터 채널 연결 시 (채팅용)
+    this.peer.on('connection', (conn) => {
+      this.dataConn = conn;
+      conn.on('data', (data) => {
+        if (this.onChatMessage) this.onChatMessage(data);
+      });
+      conn.on('close', () => {
+        this.dataConn = null;
       });
     });
 
@@ -111,10 +126,24 @@ class Sharer {
   }
 
   /**
+   * 채팅 메시지 전송
+   * @param {string} message
+   */
+  sendChat(message) {
+    if (this.dataConn && this.dataConn.open) {
+      this.dataConn.send(message);
+    }
+  }
+
+  /**
    * 피어 완전 종료
    */
   destroy() {
     this.stopCapture();
+    if (this.dataConn) {
+      this.dataConn.close();
+      this.dataConn = null;
+    }
     if (this.peer) {
       this.peer.destroy();
       this.peer = null;

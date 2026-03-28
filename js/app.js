@@ -4,6 +4,7 @@ import { Sharer } from './sharer.js';
 import { Viewer } from './viewer.js';
 import { buildShareUrl, getPeerIdFromUrl } from './url.js';
 import { PASSWORD_HASH } from './config.js';
+import { playConnectSound } from './sound.js';
 
 (function () {
   'use strict';
@@ -41,6 +42,16 @@ import { PASSWORD_HASH } from './config.js';
   const remoteVideo = $('remote-video');
   const btnFullscreen = $('btn-fullscreen');
   const videoWrapper = remoteVideo.closest('.video-wrapper');
+
+  // 채팅 UI 요소
+  const chatPopup = $('chat-popup');
+  const chatMessages = $('chat-messages');
+  const chatInput = $('chat-input');
+  const btnChatSend = $('btn-chat-send');
+  const btnChatClose = $('btn-chat-close');
+  const chatHeader = $('chat-popup-header');
+  const btnSharerChatToggle = $('btn-sharer-chat-toggle');
+  const btnViewerChatToggle = $('btn-viewer-chat-toggle');
 
   let sharer = null;
   let viewer = null;
@@ -117,10 +128,61 @@ import { PASSWORD_HASH } from './config.js';
     btnStopShare.classList.add('hidden');
     peerIdDisplay.classList.add('hidden');
     shareUrlDisplay.classList.add('hidden');
+    chatPopup.classList.add('hidden');
+    chatMessages.innerHTML = '';
+    btnSharerChatToggle.classList.add('hidden');
+    btnViewerChatToggle.classList.add('hidden');
     roleSelect.classList.remove('hidden');
     sharerPanel.classList.add('hidden');
     viewerPanel.classList.add('hidden');
   }
+
+  // --- 채팅 ---
+
+  /** 채팅 메시지 DOM 추가 */
+  function appendMessage(sender, text, isMe) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + (isMe ? 'me' : 'them');
+    const span = document.createElement('span');
+    span.className = 'chat-sender';
+    span.textContent = sender;
+    div.appendChild(span);
+    div.appendChild(document.createTextNode(text));
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  /** 채팅 팝업 토글 */
+  function toggleChat() {
+    chatPopup.classList.toggle('hidden');
+    if (!chatPopup.classList.contains('hidden')) {
+      chatInput.focus();
+    }
+  }
+
+  // --- 드래그 ---
+
+  let isDragging = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+
+  chatHeader.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    dragOffsetX = e.clientX - chatPopup.offsetLeft;
+    dragOffsetY = e.clientY - chatPopup.offsetTop;
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    chatPopup.style.left = (e.clientX - dragOffsetX) + 'px';
+    chatPopup.style.top = (e.clientY - dragOffsetY) + 'px';
+    chatPopup.style.right = 'auto';
+    chatPopup.style.bottom = 'auto';
+  });
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
 
   // --- 공유자 흐름 ---
 
@@ -141,6 +203,17 @@ import { PASSWORD_HASH } from './config.js';
 
     sharer.onStreamReady = (stream) => {
       localVideo.srcObject = stream;
+    };
+
+    sharer.onViewerConnected = () => {
+      playConnectSound();
+      btnSharerChatToggle.classList.remove('hidden');
+      chatPopup.classList.remove('hidden');
+    };
+
+    sharer.onChatMessage = (msg) => {
+      appendMessage('뷰어:', msg, false);
+      if (chatPopup.classList.contains('hidden')) chatPopup.classList.remove('hidden');
     };
 
     sharer.onError = (err) => {
@@ -183,6 +256,13 @@ import { PASSWORD_HASH } from './config.js';
       remoteVideo.srcObject = stream;
       // 일부 브라우저에서 명시적 play() 필요
       remoteVideo.play().catch(() => {});
+      btnViewerChatToggle.classList.remove('hidden');
+      chatPopup.classList.remove('hidden');
+    };
+
+    viewer.onChatMessage = (msg) => {
+      appendMessage('공유자:', msg, false);
+      if (chatPopup.classList.contains('hidden')) chatPopup.classList.remove('hidden');
     };
 
     viewer.onError = (err) => {
@@ -272,6 +352,26 @@ import { PASSWORD_HASH } from './config.js';
   inputPeerId.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') connectToSharer();
   });
+
+  // --- 채팅 전송 이벤트 ---
+
+  function sendChat() {
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+    if (sharer) sharer.sendChat(msg);
+    if (viewer) viewer.sendChat(msg);
+    appendMessage('나:', msg, true);
+    chatInput.value = '';
+  }
+
+  btnChatSend.addEventListener('click', sendChat);
+  chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendChat();
+  });
+
+  btnSharerChatToggle.addEventListener('click', toggleChat);
+  btnViewerChatToggle.addEventListener('click', toggleChat);
+  btnChatClose.addEventListener('click', () => chatPopup.classList.add('hidden'));
 
   // 페이지 로드 시 비밀번호 입력에 포커스
   inputPassword.focus();

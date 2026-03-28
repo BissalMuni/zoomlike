@@ -10,9 +10,11 @@ class Viewer {
   constructor() {
     this.peer = null;
     this.currentCall = null;
+    this.dataConn = null;
     this.onStatusChange = null;
     this.onStreamReceived = null;
     this.onError = null;
+    this.onChatMessage = null;
   }
 
   /**
@@ -59,6 +61,16 @@ class Viewer {
 
     if (this.onStatusChange) this.onStatusChange('connecting', '연결 중...');
 
+    // 데이터 채널 연결 (채팅용)
+    const dataConn = this.peer.connect(sharerId);
+    this.dataConn = dataConn;
+    dataConn.on('data', (data) => {
+      if (this.onChatMessage) this.onChatMessage(data);
+    });
+    dataConn.on('close', () => {
+      this.dataConn = null;
+    });
+
     // 빈 스트림으로 call (공유자가 answer로 실제 스트림 반환)
     const call = this.peer.call(sharerId, this._createEmptyStream());
     this.currentCall = call;
@@ -91,10 +103,24 @@ class Viewer {
   }
 
   /**
+   * 채팅 메시지 전송
+   * @param {string} message
+   */
+  sendChat(message) {
+    if (this.dataConn && this.dataConn.open) {
+      this.dataConn.send(message);
+    }
+  }
+
+  /**
    * 피어 완전 종료
    */
   destroy() {
     this.disconnect();
+    if (this.dataConn) {
+      this.dataConn.close();
+      this.dataConn = null;
+    }
     if (this.peer) {
       this.peer.destroy();
       this.peer = null;
