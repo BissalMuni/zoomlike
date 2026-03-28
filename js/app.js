@@ -140,6 +140,16 @@ import { ChatWindow } from './chat-window.js';
       if (viewer) viewer.sendChat(msg);
     };
     chatWin.open();
+    // 알림 배지 제거
+    btnSharerChatToggle.textContent = '💬 채팅';
+    btnViewerChatToggle.textContent = '💬 채팅';
+  }
+
+  /** 메시지 도착 알림 (채팅 윈도우가 닫혀있을 때) */
+  function notifyChat(btn) {
+    if (!btn.textContent.includes('🔴')) {
+      btn.textContent = '🔴 채팅 (새 메시지)';
+    }
   }
 
   // --- 공유자 흐름 ---
@@ -166,12 +176,11 @@ import { ChatWindow } from './chat-window.js';
     sharer.onViewerConnected = () => {
       playConnectSound();
       btnSharerChatToggle.classList.remove('hidden');
-      openChat();
     };
 
     sharer.onChatMessage = (msg) => {
-      if (!chatWin.isOpen) openChat();
       chatWin.appendMessage('뷰어:', msg, false);
+      if (!chatWin.isOpen) notifyChat(btnSharerChatToggle);
     };
 
     sharer.onError = (err) => {
@@ -215,12 +224,11 @@ import { ChatWindow } from './chat-window.js';
       // 일부 브라우저에서 명시적 play() 필요
       remoteVideo.play().catch(() => {});
       btnViewerChatToggle.classList.remove('hidden');
-      openChat();
     };
 
     viewer.onChatMessage = (msg) => {
-      if (!chatWin.isOpen) openChat();
       chatWin.appendMessage('공유자:', msg, false);
+      if (!chatWin.isOpen) notifyChat(btnViewerChatToggle);
     };
 
     viewer.onError = (err) => {
