@@ -68,14 +68,14 @@
   <div id="chat-popup" class="chat-popup hidden">
     <div class="chat-popup-header" id="chat-popup-header">
       <span>💬 채팅</span>
+      <div class="chat-toolbar">
+        <label>투명도</label>
+        <input type="range" id="chat-opacity" min="20" max="100" value="100" />
+      </div>
       <div class="chat-header-controls">
         <button id="btn-chat-topmost" class="chat-header-btn" title="항상 위">📌</button>
         <button id="btn-chat-close" class="chat-close-btn">✕</button>
       </div>
-    </div>
-    <div class="chat-toolbar">
-      <label>투명도</label>
-      <input type="range" id="chat-opacity" min="20" max="100" value="100" />
     </div>
     <div class="chat-messages" id="chat-messages"></div>
     <div class="chat-input">

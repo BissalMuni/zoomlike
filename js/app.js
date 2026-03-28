@@ -141,6 +141,8 @@ import { playConnectSound } from './sound.js';
 
   // --- 채팅 ---
 
+  const MAX_CHAT_MESSAGES = 200;
+
   /** 채팅 메시지 DOM 추가 */
   function appendMessage(sender, text, isMe) {
     const div = document.createElement('div');
@@ -151,6 +153,10 @@ import { playConnectSound } from './sound.js';
     div.appendChild(span);
     div.appendChild(document.createTextNode(text));
     chatMessages.appendChild(div);
+    // 오래된 메시지 제거
+    while (chatMessages.children.length > MAX_CHAT_MESSAGES) {
+      chatMessages.removeChild(chatMessages.firstChild);
+    }
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
@@ -162,11 +168,12 @@ import { playConnectSound } from './sound.js';
     }
   }
 
-  // --- 드래그 ---
+  // --- 드래그 (requestAnimationFrame으로 레이아웃 스래싱 방지) ---
 
   let isDragging = false;
   let dragOffsetX = 0;
   let dragOffsetY = 0;
+  let dragRAF = 0;
 
   chatHeader.addEventListener('mousedown', (e) => {
     isDragging = true;
@@ -176,10 +183,13 @@ import { playConnectSound } from './sound.js';
 
   document.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
-    chatPopup.style.left = (e.clientX - dragOffsetX) + 'px';
-    chatPopup.style.top = (e.clientY - dragOffsetY) + 'px';
-    chatPopup.style.right = 'auto';
-    chatPopup.style.bottom = 'auto';
+    if (dragRAF) cancelAnimationFrame(dragRAF);
+    dragRAF = requestAnimationFrame(() => {
+      chatPopup.style.left = (e.clientX - dragOffsetX) + 'px';
+      chatPopup.style.top = (e.clientY - dragOffsetY) + 'px';
+      chatPopup.style.right = 'auto';
+      chatPopup.style.bottom = 'auto';
+    });
   });
 
   document.addEventListener('mouseup', () => {

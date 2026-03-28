@@ -92,17 +92,6 @@ class Viewer {
   }
 
   /**
-   * 연결 해제
-   */
-  disconnect() {
-    if (this.currentCall) {
-      this.currentCall.close();
-      this.currentCall = null;
-    }
-    if (this.onStatusChange) this.onStatusChange('disconnected', '연결 해제됨');
-  }
-
-  /**
    * 채팅 메시지 전송
    * @param {string} message
    */
@@ -116,7 +105,10 @@ class Viewer {
    * 피어 완전 종료
    */
   destroy() {
-    this.disconnect();
+    if (this.currentCall) {
+      this.currentCall.close();
+      this.currentCall = null;
+    }
     if (this.dataConn) {
       this.dataConn.close();
       this.dataConn = null;
@@ -152,6 +144,7 @@ class Viewer {
       const dest = audioCtx.createMediaStreamDestination();
       const audioTrack = dest.stream.getAudioTracks()[0];
       if (audioTrack) stream.addTrack(audioTrack);
+      audioCtx.close();
     } catch { /* 유저 제스처 없이 AudioContext 생성 실패 시 비디오만 전송 */ }
 
     return stream;

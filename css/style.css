@@ -377,16 +377,16 @@ video {
 .chat-toolbar {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.3rem 0.75rem;
-  background: #1f1f36;
-  font-size: 0.75rem;
-  color: #888;
+  gap: 0.4rem;
+  flex: 1;
+  margin: 0 0.5rem;
+  font-size: 0.7rem;
+  color: #666;
 }
 
 .chat-toolbar input[type="range"] {
-  flex: 1;
-  height: 4px;
+  width: 60px;
+  height: 3px;
   accent-color: #7c6ff7;
   cursor: pointer;
 }
