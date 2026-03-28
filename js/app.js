@@ -124,8 +124,6 @@ import { ChatWindow } from './chat-window.js';
     peerIdDisplay.classList.add('hidden');
     shareUrlDisplay.classList.add('hidden');
     chatWin.close();
-    btnSharerChatToggle.classList.add('hidden');
-    btnViewerChatToggle.classList.add('hidden');
     roleSelect.classList.remove('hidden');
     sharerPanel.classList.add('hidden');
     viewerPanel.classList.add('hidden');
@@ -175,7 +173,6 @@ import { ChatWindow } from './chat-window.js';
 
     sharer.onViewerConnected = () => {
       playConnectSound();
-      btnSharerChatToggle.classList.remove('hidden');
     };
 
     sharer.onChatMessage = (msg) => {
@@ -223,7 +220,6 @@ import { ChatWindow } from './chat-window.js';
       remoteVideo.srcObject = stream;
       // 일부 브라우저에서 명시적 play() 필요
       remoteVideo.play().catch(() => {});
-      btnViewerChatToggle.classList.remove('hidden');
     };
 
     viewer.onChatMessage = (msg) => {
