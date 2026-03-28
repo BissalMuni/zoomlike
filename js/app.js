@@ -52,6 +52,8 @@ import { playConnectSound } from './sound.js';
   const chatHeader = $('chat-popup-header');
   const btnSharerChatToggle = $('btn-sharer-chat-toggle');
   const btnViewerChatToggle = $('btn-viewer-chat-toggle');
+  const btnChatTopmost = $('btn-chat-topmost');
+  const chatOpacitySlider = $('chat-opacity');
 
   let sharer = null;
   let viewer = null;
@@ -372,6 +374,17 @@ import { playConnectSound } from './sound.js';
   btnSharerChatToggle.addEventListener('click', toggleChat);
   btnViewerChatToggle.addEventListener('click', toggleChat);
   btnChatClose.addEventListener('click', () => chatPopup.classList.add('hidden'));
+
+  // 항상 위 토글
+  btnChatTopmost.addEventListener('click', () => {
+    chatPopup.classList.toggle('topmost');
+    btnChatTopmost.classList.toggle('active');
+  });
+
+  // 투명도 조절
+  chatOpacitySlider.addEventListener('input', () => {
+    chatPopup.style.opacity = chatOpacitySlider.value / 100;
+  });
 
   // 페이지 로드 시 비밀번호 입력에 포커스
   inputPassword.focus();

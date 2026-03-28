@@ -339,6 +339,28 @@ video {
   font-weight: 600;
 }
 
+.chat-header-controls {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.chat-header-btn {
+  background: transparent;
+  color: #888;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.chat-header-btn:hover {
+  background: rgba(124, 111, 247, 0.15);
+}
+
+.chat-header-btn.active {
+  color: #7c6ff7;
+  background: rgba(124, 111, 247, 0.2);
+}
+
 .chat-close-btn {
   background: transparent;
   color: #888;
@@ -350,6 +372,27 @@ video {
 .chat-close-btn:hover {
   color: #f44336;
   background: rgba(244, 67, 54, 0.15);
+}
+
+.chat-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  background: #1f1f36;
+  font-size: 0.75rem;
+  color: #888;
+}
+
+.chat-toolbar input[type="range"] {
+  flex: 1;
+  height: 4px;
+  accent-color: #7c6ff7;
+  cursor: pointer;
+}
+
+.chat-popup.topmost {
+  z-index: 2147483647;
 }
 
 .chat-messages {
